@@ -14,11 +14,6 @@ class Starter extends React.Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
-    // componentDidMount() {
-    //     let tileData = this.getInitialTiles()
-    //     this.setState({tileData: tileData});
-    // }
-
     getInitialTiles() {
         let letters = 'ABCDEFGHABCDEFGH'.split('')
         let gameTiles = {}
@@ -71,7 +66,6 @@ class Starter extends React.Component {
     }
 
     reset(_ev) {
-        // TODO
         let tilesGenerated = this.getInitialTiles()
         this.setState({tileData: tilesGenerated})
     }
@@ -85,17 +79,19 @@ class Starter extends React.Component {
             for (let col = 1; col <= 4; col++) {
                 // Referred to reactjs documentation for handle click
                 let id = grid_ind++
-                col_grids.push(<td key={id} id={id} className="column column-10 tile"
+                let classVar = 'column column-10 tile ';
+                classVar += this.state.tileData[id]['status'] == 'hide' ? '' : 'tile-' + this.state.tileData[id]['status']
+                col_grids.push(<td key={id} id={id} className={classVar}
                                    onClick={this.handleClick}>{this.state.tileData[id]['status'] != 'hide'
                     ? this.state.tileData[id]['letter'] : ''}</td>)
             }
             grid_rows.push(<tr key={row} className="row">{col_grids}</tr>)
         }
-        let tiles = <div>
-            <table className="container">
+        let tiles = <span className="column">
+            <table>
                 <tbody>{grid_rows}</tbody>
             </table>
-        </div>;
+        </span>;
 
         return <div>
             {tiles}
