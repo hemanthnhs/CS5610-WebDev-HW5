@@ -7,3 +7,8 @@
     text-align: center;
 }
 
+td.tile{
+    height: 80px;
+    border: 1px solid black;
+}
+
