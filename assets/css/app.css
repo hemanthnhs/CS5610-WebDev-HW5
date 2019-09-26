@@ -8,6 +8,9 @@
 }
 
 td.tile{
+    font-weight: bold;
+    font-size: 3em;
+    text-align: center;
     height: 80px;
     border: 1px solid black;
 }

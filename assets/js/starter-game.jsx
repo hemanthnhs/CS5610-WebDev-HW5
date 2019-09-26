@@ -29,21 +29,51 @@ class Starter extends React.Component {
             let i = Math.floor(Math.random() * (iter));
             gameTiles[iter] = {}
             gameTiles[iter]['letter'] = letters.splice(i, 1)[0]
-            gameTiles[iter]['display'] = false
+            gameTiles[iter]['status'] = "hide"
+            gameTiles[iter]['count'] = 0
             iter--;
         }
         return gameTiles;
     }
 
     handleClick(event) {
+        event.persist();
         let data = this.state.tileData;
-        data[event.target.id]['display'] = true
-        this.setState({tileData: data})
+        let currentActive = _.filter(data, {'status': 'active'})
+        if (currentActive.length < 2) {
+            if (data[event.target.id]['status'] != 'complete') {
+                let activeKey = _.findKey(data, {'status': 'active'})
+                if (activeKey != event.target.id) {
+                    data[event.target.id]['status'] = 'active'
+                    data[event.target.id]['count']++
+                    this.setState({tileData: data})
+                    if (activeKey != undefined) {
+                        if (data[activeKey]['letter'] == data[event.target.id]['letter']) {
+                            data[activeKey]['status'] = 'complete'
+                            data[event.target.id]['status'] = 'complete'
+                            this.setState({tileData: data})
+                            let completedTiles = _.filter(data, {'status': 'complete'})
+                            if (completedTiles.length == 16) {
+                                alert("WON!!!");
+                            }
+                        } else {
+                            let that = this;
+                            setTimeout(function () {
+                                data[activeKey]['status'] = 'hide'
+                                data[event.target.id]['status'] = 'hide'
+                                that.setState({tileData: data})
+                            }, 1000);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     reset(_ev) {
         // TODO
-        alert("TODO Game Reset");
+        let tilesGenerated = this.getInitialTiles()
+        this.setState({tileData: tilesGenerated})
     }
 
     render() {
@@ -56,7 +86,7 @@ class Starter extends React.Component {
                 // Referred to reactjs documentation for handle click
                 let id = grid_ind++
                 col_grids.push(<td key={id} id={id} className="column column-10 tile"
-                                   onClick={this.handleClick}>{this.state.tileData[id]['display']
+                                   onClick={this.handleClick}>{this.state.tileData[id]['status'] != 'hide'
                     ? this.state.tileData[id]['letter'] : ''}</td>)
             }
             grid_rows.push(<tr key={row} className="row">{col_grids}</tr>)
