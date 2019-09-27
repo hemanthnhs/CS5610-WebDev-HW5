@@ -47,10 +47,6 @@ class Starter extends React.Component {
                             data[activeKey]['status'] = 'complete'
                             data[event.target.id]['status'] = 'complete'
                             this.setState({tileData: data})
-                            let completedTiles = _.filter(data, {'status': 'complete'})
-                            if (completedTiles.length == 16) {
-                                alert("WON!!!");
-                            }
                         } else {
                             let that = this;
                             setTimeout(function () {
@@ -78,8 +74,17 @@ class Starter extends React.Component {
         return score;
     }
 
+    fetchScore() {
+        let completedTiles = _.filter(this.state.tileData, {'status': 'complete'})
+        if (this.getScore() == 0) {
+            return "Yet to start";
+        } else if (completedTiles.length == 16) {
+            return "YOU WIN!!!!";
+        }
+        return "In Progress..";
+    }
+
     render() {
-        let button = <span><button onClick={this.reset.bind(this)}>Reset Game</button></span>
         let grid_rows = []
         let grid_ind = 1
         for (let row = 1; row <= 4; row++) {
@@ -88,21 +93,24 @@ class Starter extends React.Component {
                 // Referred to reactjs documentation for handle click
                 let id = grid_ind++
                 let classVar = this.state.tileData[id]['status'] == 'hide' ? '' : 'tile-' + this.state.tileData[id]['status']
-                col_grids.push(<td key={id} id={id} className={'column column-10 tile ' + classVar}
+                col_grids.push(<td key={id} id={id} className={'column column-21 tile ' + classVar}
                                    onClick={this.handleClick}>{this.state.tileData[id]['status'] != 'hide'
                     ? this.state.tileData[id]['letter'] : ''}</td>)
             }
             grid_rows.push(<tr key={row} className="row">{col_grids}</tr>)
         }
-        let tiles = <span className="column">
+        let tiles = <span className="column column-40">
             <table>
                 <tbody>{grid_rows}</tbody>
             </table>
         </span>;
-        let score = <div>Score : {this.getScore()}</div>;
-
-        return <div>
+        let status = <span className="column column-25 column-offset-10"><h1><u>Game Status</u></h1><h2>{this.fetchScore()}</h2></span>;
+        let score = <span className="column column-20"><h1><u>Score</u></h1><h2>{this.getScore()}</h2></span>;
+        let button = <span className="column column-10"><button
+            onClick={this.reset.bind(this)}>Reset Game</button></span>
+        return <div className="row">
             {tiles}
+            {status}
             {score}
             {button}
         </div>;
