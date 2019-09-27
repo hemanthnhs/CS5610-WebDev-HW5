@@ -7,7 +7,8 @@
 }
 
 td.tile {
-    transition:0.2s;
+    /* Referred to CSS designs on W3 Schools */
+    transition: 0.2s;
     font-weight: bold;
     color: black;
     text-shadow: 2px 1px lightslategrey;
@@ -15,31 +16,29 @@ td.tile {
     font-size: 3em;
     text-align: center;
     height: 100px;
-    box-shadow: 0 2px 3px 0 grey;
-    border: 1px solid black;
+    box-shadow: 7px 5px 5px -5px black, inset 46px 26px 25px -17px #00000059;
+    border: 2px solid black;
     background: rgba(0, 0, 0, 0.56);
-    box-shadow: 0 2px 3px 0 grey;
 }
 
 td.tile:hover {
-    /* Referred to CSS designs on W3 Schools */
     box-shadow: 0 4px 6px 0 grey;
 }
 
-td.tile-active{
-    transition:0.3s;
-    transform: rotateY(180deg);
-    transform: rotateY(-180deg);
-    transform-style: preserve-3d;
-    background: #6565862e;
+td.tile-active {
+    transition: 0.3s;
+    border: 2px solid #73310d;
+    background: radial-gradient(white, #de7e466b);
+    box-shadow: 7px 5px 5px -5px black;
 }
 
 td.tile-complete {
-    transition:0.4s;
+    transition: 0.4s;
     color: #505154;
     text-shadow: none;
     box-shadow: none;
-    background: lightblue;
+    background: radial-gradient(#b1bbba8a, lightblue);
+    border: 2px solid dimgrey;
 }
 
 td.tile-complete:hover {

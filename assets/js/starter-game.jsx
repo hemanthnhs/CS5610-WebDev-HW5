@@ -65,9 +65,17 @@ class Starter extends React.Component {
         }
     }
 
-    reset(_ev) {
+    reset() {
         let tilesGenerated = this.getInitialTiles()
         this.setState({tileData: tilesGenerated})
+    }
+
+    getScore() {
+        let score = 0;
+        _.map(this.state.tileData, function (key, value) {
+            score += key['count'];
+        });
+        return score;
     }
 
     render() {
@@ -79,9 +87,8 @@ class Starter extends React.Component {
             for (let col = 1; col <= 4; col++) {
                 // Referred to reactjs documentation for handle click
                 let id = grid_ind++
-                let classVar = 'column column-10 tile ';
-                classVar += this.state.tileData[id]['status'] == 'hide' ? '' : 'tile-' + this.state.tileData[id]['status']
-                col_grids.push(<td key={id} id={id} className={classVar}
+                let classVar = this.state.tileData[id]['status'] == 'hide' ? '' : 'tile-' + this.state.tileData[id]['status']
+                col_grids.push(<td key={id} id={id} className={'column column-10 tile ' + classVar}
                                    onClick={this.handleClick}>{this.state.tileData[id]['status'] != 'hide'
                     ? this.state.tileData[id]['letter'] : ''}</td>)
             }
@@ -92,9 +99,11 @@ class Starter extends React.Component {
                 <tbody>{grid_rows}</tbody>
             </table>
         </span>;
+        let score = <div>Score : {this.getScore()}</div>;
 
         return <div>
             {tiles}
+            {score}
             {button}
         </div>;
     }
