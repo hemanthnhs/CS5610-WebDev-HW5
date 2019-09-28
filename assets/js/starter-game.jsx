@@ -31,38 +31,37 @@ class Starter extends React.Component {
         return gameTiles;
     }
 
-    closeUnmatched(data, [id1, id2]) {
-        data[id1]['status'] = 'hide'
-        data[id2]['status'] = 'hide'
+    updateTiles(data, ids, status, incrementCount = false) {
+        _.map(ids, function (id) {
+            data[id]['status'] = status
+            if (status != 'complete' && incrementCount) {
+                data[id]['count']++
+            }
+        })
+        if (status == 'complete' && incrementCount) {
+            data[ids[1]]['count']++
+        }
         this.setState({tileData: data})
     }
 
-    handleClick(event) {
-        event.persist();
+    handleClick(id) {
         let data = this.state.tileData;
         let currentActive = _.filter(data, {'status': 'active'})
         if (currentActive.length < 2) {
-            if (data[event.target.id]['status'] != 'complete') {
+            if (data[id]['status'] != 'complete') {
                 let activeKey = _.findKey(data, {'status': 'active'})
-                if (activeKey != event.target.id) {
+                if (activeKey != id) {
                     if (activeKey != undefined) {
-                        if (data[activeKey]['letter'] == data[event.target.id]['letter']) {
-                            data[activeKey]['status'] = 'complete'
-                            data[event.target.id]['status'] = 'complete'
-                            data[event.target.id]['count']++
-                            this.setState({tileData: data})
+                        if (data[activeKey]['letter'] == data[id]['letter']) {
+                            this.updateTiles(data, [activeKey, id], 'complete', true)
                         } else {
-                            data[event.target.id]['status'] = 'active'
-                            data[event.target.id]['count']++
-                            this.setState({tileData: data})
+                            this.updateTiles(data, [id], 'active', true)
                             setTimeout(() => {
-                                this.closeUnmatched(data, [activeKey, event.target.id])
+                                this.updateTiles(data, [activeKey, id], 'hide')
                             }, 1000);
                         }
                     } else {
-                        data[event.target.id]['status'] = 'active'
-                        data[event.target.id]['count']++
-                        this.setState({tileData: data})
+                        this.updateTiles(data, [id], 'active', true)
                     }
                 }
             }
@@ -82,12 +81,7 @@ class Starter extends React.Component {
         return score;
     }
 
-    fetchGameStatus() {
-        const STATUS = {
-            BEGIN: "Yet to Start..",
-            INPROGRESS: "In Progress...",
-            COMPLETE: "YOU WIN!!!!"
-        }
+    fetchGameStatus(STATUS) {
         let completedTiles = _.filter(this.state.tileData, {'status': 'complete'})
         if (this.getScore() == 0) {
             return STATUS.BEGIN;
@@ -97,7 +91,7 @@ class Starter extends React.Component {
         return STATUS.INPROGRESS;
     }
 
-    render() {
+    generateGridRows() {
         let grid_rows = []
         let grid_ind = 1
         for (let row = 1; row <= 4; row++) {
@@ -107,22 +101,65 @@ class Starter extends React.Component {
                 let id = grid_ind++
                 let classVar = this.state.tileData[id]['status'] == 'hide' ? '' : 'tile-' + this.state.tileData[id]['status']
                 col_grids.push(<td key={id} id={id} className={'column column-25 tile ' + classVar}
-                                   onClick={this.handleClick}>{this.state.tileData[id]['status'] != 'hide'
+                                   onClick={() => {
+                                       this.handleClick(id)
+                                   }}>{this.state.tileData[id]['status'] != 'hide'
                     ? this.state.tileData[id]['letter'] : ''}</td>)
             }
             grid_rows.push(<tr key={row} className="row">{col_grids}</tr>)
         }
+        return grid_rows
+    }
+
+    renderInstructionSection(gameStatus, STATUS) {
+        if (gameStatus == STATUS.BEGIN) {
+            return <span className="game-instruction">Click on any tile to begin the game</span>
+        } else {
+            let buttonLabel = (gameStatus == STATUS.COMPLETE) ? " Restart Game " : "  Reset  Game  "
+            let button = <button className="gameplay-btn" onClick={this.reset.bind(this)}>{buttonLabel}</button>
+            return button
+        }
+    }
+
+    renderScoreArea(gameStatus, STATUS) {
+        if (gameStatus != STATUS.BEGIN) {
+            let scoreLabel = (gameStatus == STATUS.COMPLETE) ? "Final Score" : "Score"
+            let score = <span
+                className="column column-100"><h1><u>{scoreLabel}</u></h1><h2>{this.getScore()}</h2></span>;
+            return score
+        }
+        return <span></span>
+    }
+
+    renderGameInfo() {
+        const STATUS = {
+            BEGIN: "Yet to Start..",
+            INPROGRESS: "In Progress...",
+            COMPLETE: "YOU WIN!!!!"
+        }
+        let gameStatus = this.fetchGameStatus(STATUS);
+        let status = <span
+            className="column column-100"><h1><u>Game Status</u></h1><h2>{gameStatus}</h2></span>;
+        let score = this.renderScoreArea(gameStatus, STATUS)
+        let button = this.renderInstructionSection(gameStatus, STATUS);
+
+        let instructions = <span className="column column-100"
+                                 id="instructions-section">{button}</span>
+        let gameInfo = <span className="column column-50 column-offset-10">
+                            {status}{score}{instructions}
+                        </span>
+        return gameInfo
+    }
+
+    render() {
+        let grid_rows = this.generateGridRows()
         let tiles = <span className="column column-80 column-offset-20">
             <table>
                 <tbody>{grid_rows}</tbody>
             </table>
         </span>;
         let header = <div id="game-heard" className="column column=100">Memory Game</div>
-        let status = <span
-            className="column column-100"><h1><u>Game Status</u></h1><h2>{this.fetchGameStatus()}</h2></span>;
-        let score = <span className="column column-100"><h1><u>Score</u></h1><h2>{this.getScore()}</h2></span>;
-        let button = <span className="column column-100" id="reset-btn"><button
-            onClick={this.reset.bind(this)}>Reset Game</button></span>
+        let gameInfoDisplay = this.renderGameInfo()
         return <div>
             <div className="row">
                 {header}
@@ -131,11 +168,7 @@ class Starter extends React.Component {
                 <span className="column column-50">
                     {tiles}
                 </span>
-                <span className="column column-50 column-offset-10">
-                    {status}
-                    {score}
-                    {button}
-                </span>
+                {gameInfoDisplay}
             </div>
         </div>;
     }

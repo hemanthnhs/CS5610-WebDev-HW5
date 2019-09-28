@@ -53,6 +53,10 @@ div#game-heard {
     text-align: center;
 }
 
-span#reset-btn {
+span#instructions-section {
     margin-top: 10%;
+}
+
+span.game-instruction {
+    font-size: 20px;
 }
