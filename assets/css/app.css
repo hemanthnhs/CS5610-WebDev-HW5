@@ -44,3 +44,15 @@ td.tile-complete {
 td.tile-complete:hover {
     box-shadow: none;
 }
+
+div#game-heard {
+    border-bottom: 1.2px outset black;
+    margin-bottom: 40px;
+    font-size: 3em;
+    font-weight: 400;
+    text-align: center;
+}
+
+span#reset-btn {
+    margin-top: 10%;
+}
