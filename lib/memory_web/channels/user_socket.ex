@@ -3,6 +3,7 @@ defmodule MemoryWeb.UserSocket do
 
   ## Channels
   # channel "room:*", MemoryWeb.RoomChannel
+    channel "tiles:*", MemoryWeb.TilesChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After

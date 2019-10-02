@@ -1,3 +1,23 @@
-<div id="root">
-  React app loading...
+<script>
+    function redirect_to_game(){
+        /* Attribution https://stackoverflow.com/questions/33379428/can-a-form-submit-to-different-pages-based-on-field-value */
+        var gameId = document.getElementById("game-name").value;
+        location.href = "/tile/"+gameId;
+    }
+</script>
+<div id="game-heard" className="column column=100">
+    Memory Game
 </div>
+<form action="javascript:redirect_to_game();">
+    <div class="row">
+      <div class="column column-30">
+        <h4 id="index-page">Enter Game Name</h4>
+      </div>
+      <div class="column column-30">
+        <input id="game-name" type = "text" required/>
+      </div>
+      <div class="column column-30">
+        <button>Begin</button>
+      </div>
+    </div>
+</form>
