@@ -5,15 +5,19 @@ defmodule MemoryWeb.TilesChannel do
   def join("tiles:" <> name, payload, socket) do
     if authorized?(payload) do
       tile = Tile.new()
+      socket = socket
+      |> assign(:tile, tile)
+      |> assign(:name, name)
       {:ok, %{"join" => name,"tile" => Tile.view(tile)}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
   end
 
-  def handle_in("roll", payload, socket) do
-    resp = %{ "roll" => :rand.uniform(6) }
-    {:reply, {:roll, resp}, socket}
+  def handle_in("select", %{"tile_id" => tile_id}, socket) do
+     tile = Tile.select(socket.assigns[:tile],tile_id)
+     socket = assign(socket, :tile, tile)
+     {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
   end
 
   # Channels can be used in a request/response fashion

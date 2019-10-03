@@ -27,8 +27,8 @@ class Starter extends React.Component {
         this.channel = props.channel;
         //Generating tiles data and initializing tile properties
         //{0:{letter:'D',status:'hide',count:0},1:{...},....}
-        let tilesGenerated = this.getInitialTiles()
-        this.state = {tileData: tilesGenerated};
+        // this.state = {ss: tilesGenerated, active_tiles: [], completed_tiles: [], clicks: 0};
+        this.state = {tiles: [], active_tiles: [], completed_tiles: [], clicks: 0};
         // Attribution http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/notes/05-react/
         this.handleClick = this.handleClick.bind(this);
 
@@ -40,28 +40,7 @@ class Starter extends React.Component {
 
     got_view(view) {
         console.log("new view", view);
-        this.setState(view.game);
-    }
-
-    getInitialTiles() {
-        //Having the letters for our game
-        let letters = 'ABCDEFGHABCDEFGH'.split('')
-        let gameTiles = {}
-        //Temp variable for iteration purposes
-        let iter = letters.length
-        while (iter != 0) {
-            //Referred https://flaviocopes.com/how-to-generate-random-number-between/ for random number generation
-            //in a range
-            let i = Math.floor(Math.random() * (iter));
-            // Setting the game config
-            // Display structure defined at line 9
-            gameTiles[iter] = {}
-            gameTiles[iter]['letter'] = letters.splice(i, 1)[0]
-            gameTiles[iter]['status'] = "hide"
-            gameTiles[iter]['count'] = 0
-            iter--;
-        }
-        return gameTiles;
+        this.setState(view.tile);
     }
 
     //This method serves the purpose of updating any tile detail i.e changing state based on given params
@@ -87,55 +66,14 @@ class Starter extends React.Component {
 
     //This method is to handle the click of tiles. Based on the state of game, the new state will be generated here.
     handleClick(id) {
-        //taking the state object in another variable
-        let data = this.state.tileData;
-        //Getting the currently active tiles
-        let currentActive = _.filter(data, {'status': 'active'})
-        //To prevent actions during delay
-        if (currentActive.length < 2) {
-            //For matched tiles nothing is to be done
-            if (data[id]['status'] != 'complete') {
-                //Finding the active tile index/key
-                let activeKey = _.findKey(data, {'status': 'active'})
-                //Clicking on currently active tile again
-                if (activeKey != id) {
-                    //If this is the second active tile check for next scenario i.e match or not
-                    if (activeKey != undefined) {
-                        //For match condition
-                        if (data[activeKey]['letter'] == data[id]['letter']) {
-                            this.updateTiles(data, [activeKey, id], 'complete', true)
-                        } else {
-                            //For not match condition
-                            //First show the selected tiles as active
-                            this.updateTiles(data, [id], 'active', true)
-                            //Update state after the delay
-                            setTimeout(() => {
-                                this.updateTiles(data, [activeKey, id], 'hide')
-                            }, 1000);
-                        }
-                    } else {
-                        //For first active tile update the state with active
-                        this.updateTiles(data, [id], 'active', true)
-                    }
-                }
-            }
-        }
+        this.channel.push("select", {tile_id: id})
+            .receive("ok", this.got_view.bind(this));
     }
 
     //For resetting or restarting the game
     reset() {
         let tilesGenerated = this.getInitialTiles()
         this.setState({tileData: tilesGenerated})
-    }
-
-    //Utility to get score for the game
-    getScore() {
-        let score = 0;
-        //loop through all the data and get total score
-        _.map(this.state.tileData, function (key, value) {
-            score += key['count'];
-        });
-        return score;
     }
 
     //Utility to get game status
@@ -166,61 +104,15 @@ class Starter extends React.Component {
                 let id = grid_ind++
                 // To assign class based on state
                 // Useful for styling
-                let classVar = this.state.tileData[id]['status'] == 'hide' ? '' : 'tile-' + this.state.tileData[id]['status']
-                col_grids.push(<td key={id} id={id} className={'column column-25 tile ' + classVar}
+                col_grids.push(<td key={id} id={id} className={'column column-25 tile hide'}
                                    onClick={() => {
                                        this.handleClick(id)
-                                   }}>{this.state.tileData[id]['status'] != 'hide'
-                    ? this.state.tileData[id]['letter'] : ''}</td>)
+                                   }}>{id in this.state.active_tiles
+                    ? this.state.active_tiles[id] : ''}</td>)
             }
             grid_rows.push(<tr key={row} className="row">{col_grids}</tr>)
         }
         return grid_rows
-    }
-
-    //Utility to get the game instruction/reset/restart button based on game status
-    renderInstructionSection(gameStatus, STATUS) {
-        if (gameStatus == STATUS.BEGIN) {
-            return <span className="game-instruction">Click on any tile to begin the game</span>
-        } else {
-            let buttonLabel = (gameStatus == STATUS.COMPLETE) ? " Restart Game " : "  Reset  Game  "
-            let button = <button className="gameplay-btn" onClick={this.reset.bind(this)}>{buttonLabel}</button>
-            return button
-        }
-    }
-
-    //Utility for score rendering area. Not to display before the game begin
-    renderScoreArea(gameStatus, STATUS) {
-        if (gameStatus != STATUS.BEGIN) {
-            //When game completes
-            let scoreLabel = (gameStatus == STATUS.COMPLETE) ? "Final Score" : "Score"
-            let score = <span
-                className="column column-100"><h1><u>{scoreLabel}</u></h1><h2>{this.getScore()}</h2></span>;
-            return score
-        }
-        return <span></span>
-    }
-
-    renderGameInfo() {
-        //enum variable for game status
-        const STATUS = {
-            BEGIN: "Yet to Start..",
-            INPROGRESS: "In Progress...",
-            COMPLETE: "YOU WIN!!!!"
-        }
-        //Get game status
-        let gameStatus = this.fetchGameStatus(STATUS);
-        let status = <span
-            className="column column-100"><h1><u>Game Status</u></h1><h2>{gameStatus}</h2></span>;
-        let score = this.renderScoreArea(gameStatus, STATUS)
-        let button = this.renderInstructionSection(gameStatus, STATUS);
-
-        let instructions = <span className="column column-100"
-                                 id="instructions-section">{button}</span>
-        let gameInfo = <span className="column column-50 column-offset-10">
-                            {status}{score}{instructions}
-                        </span>
-        return gameInfo
     }
 
     //Render
@@ -232,7 +124,6 @@ class Starter extends React.Component {
             </table>
         </span>;
         let header = <div id="game-heard" className="column column=100">Memory Game</div>
-        let gameInfoDisplay = this.renderGameInfo()
         return <div>
             <div className="row">
                 {header}
@@ -241,7 +132,6 @@ class Starter extends React.Component {
                 <span className="column column-50">
                     {tiles}
                 </span>
-                {gameInfoDisplay}
             </div>
         </div>;
     }
