@@ -1,10 +1,16 @@
 defmodule MemoryWeb.TilesChannel do
   use MemoryWeb, :channel
+
   alias Memory.Tile
+  alias Memory.BackupAgent
 
   def join("tiles:" <> name, payload, socket) do
     if authorized?(payload) do
-      tile = Tile.new()
+      IO.puts "==========================================="
+      IO.puts name
+      IO.puts "==========================================="
+      tile = BackupAgent.get(name) || Tile.new()
+      BackupAgent.put(name, tile)
       socket = socket
       |> assign(:tile, tile)
       |> assign(:name, name)
@@ -15,20 +21,26 @@ defmodule MemoryWeb.TilesChannel do
   end
 
   def handle_in("select", %{"tile_id" => tile_id}, socket) do
+     name = socket.assigns[:name]
      tile = Tile.select(socket.assigns[:tile],tile_id)
      socket = assign(socket, :tile, tile)
+     BackupAgent.put(name, tile)
      {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
   end
 
   def handle_in("clear_active", payload, socket) do
+     name = socket.assigns[:name]
      tile = Tile.clear_active(socket.assigns[:tile])
      socket = assign(socket, :tile, tile)
+     BackupAgent.put(name, tile)
      {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
   end
 
   def handle_in("reset", payload, socket) do
+     name = socket.assigns[:name]
      tile = Tile.new()
      socket = assign(socket, :tile, tile)
+     BackupAgent.put(name, tile)
      {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
   end
 

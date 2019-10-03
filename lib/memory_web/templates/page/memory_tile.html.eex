@@ -1,5 +1,5 @@
 <script>
- window.gameName = "<%= @name %>";
+ window.tileName = "<%= @name %>";
 </script>
 <div class="row">
   <div class="column">

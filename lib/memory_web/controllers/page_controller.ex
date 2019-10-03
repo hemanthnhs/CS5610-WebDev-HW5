@@ -6,6 +6,9 @@ defmodule MemoryWeb.PageController do
   end
 
   def tile_game(conn, %{"name" => name}) do
+    IO.puts "==========================================="
+    IO.puts name
+    IO.puts "==========================================="
     render conn, "memory_tile.html", name: name
   end
 end
