@@ -20,6 +20,18 @@ defmodule MemoryWeb.TilesChannel do
      {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
   end
 
+  def handle_in("clear_active", payload, socket) do
+     tile = Tile.clear_active(socket.assigns[:tile])
+     socket = assign(socket, :tile, tile)
+     {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
+  end
+
+  def handle_in("reset", payload, socket) do
+     tile = Tile.new()
+     socket = assign(socket, :tile, tile)
+     {:reply, {:ok, %{ "tile" => Tile.view(tile)}}, socket}
+  end
+
   # Channels can be used in a request/response fashion
   # by sending replies to requests from the client
   def handle_in("ping", payload, socket) do

@@ -28,18 +28,27 @@ class Starter extends React.Component {
     got_view(view) {
         console.log("new view", view);
         this.setState(view.tile);
+        if(view.tile.active_tiles.length == 2){
+            //Update state after the delay
+            setTimeout(() => {
+                this.channel.push("clear_active", {})
+                    .receive("ok", this.got_view.bind(this));
+            }, 1000);
+        }
     }
 
     //This method is to handle the click of tiles. Based on the state of game, the new state will be generated here.
     handleClick(id) {
-        this.channel.push("select", {tile_id: id})
-            .receive("ok", this.got_view.bind(this));
+        if(this.state.active_tiles.length != 2){
+            this.channel.push("select", {tile_id: id})
+                .receive("ok", this.got_view.bind(this));
+        }
     }
 
     //For resetting or restarting the game
     reset() {
-        let tilesGenerated = this.getInitialTiles()
-        this.setState({tileData: tilesGenerated})
+        this.channel.push("reset", {})
+            .receive("ok", this.got_view.bind(this));
     }
 
     //Utility to get game status

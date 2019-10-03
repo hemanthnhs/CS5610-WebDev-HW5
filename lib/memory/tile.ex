@@ -51,11 +51,19 @@ defmodule Memory.Tile do
     if Enum.member?(active_tiles++completed_tiles, tile_id) do
         %{tile | active_tiles: active_tiles, completed_tiles: completed_tiles}
     else
-        {active_tiles,completed_tiles} = updated_tile_status(tiles, active_tiles, completed_tiles,tile_id)
-        clicks = tile.clicks + 1
-        gameStatus = get_gamestatus(completed_tiles)
-        %{tile | clicks: clicks, active_tiles: active_tiles, completed_tiles: completed_tiles, gameStatus: gameStatus}
+        if length(active_tiles) == 2 do
+            %{tile | active_tiles: active_tiles, completed_tiles: completed_tiles}
+        else
+            {active_tiles,completed_tiles} = updated_tile_status(tiles, active_tiles, completed_tiles,tile_id)
+            clicks = tile.clicks + 1
+            gameStatus = get_gamestatus(completed_tiles)
+            %{tile | clicks: clicks, active_tiles: active_tiles, completed_tiles: completed_tiles, gameStatus: gameStatus}
+        end
     end
+  end
+
+  def clear_active(tile) do
+    %{tile | active_tiles: []}
   end
 
   def generate_tiles do
