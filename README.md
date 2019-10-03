@@ -26,11 +26,7 @@ information like score and the button to reset is only provided after the game b
 ## Attributions and References
     
 Course notes - http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/
-ReactJS documentation - https://reactjs.org/docs/
-Stack overflow references - https://stackoverflow.com/questions/50466734/delay-react-onmouseover-event
-    - https://stackoverflow.com/questions/22876978/loop-inside-react-jsx
-Personal Project - https://github.com/hemanthnhs/Pug-Infi
-CSS Styling - Referred to W3Schools
+https://elixirschool.com/en/lessons/basics/strings/
 
 ## Server Setup
 

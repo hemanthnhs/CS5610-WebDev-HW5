@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import _ from 'lodash';
 
 export default function game_init(root, channel) {
-    ReactDOM.render(<Starter/>, root);
+    ReactDOM.render(<Starter channel={channel}/>, root);
 }
 
 // State structure:
@@ -24,12 +24,23 @@ class Starter extends React.Component {
     //Constructor method for initializing the state
     constructor(props) {
         super(props);
+        this.channel = props.channel;
         //Generating tiles data and initializing tile properties
         //{0:{letter:'D',status:'hide',count:0},1:{...},....}
         let tilesGenerated = this.getInitialTiles()
         this.state = {tileData: tilesGenerated};
         // Attribution http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/notes/05-react/
         this.handleClick = this.handleClick.bind(this);
+
+        this.channel
+            .join()
+            .receive("ok", this.got_view.bind(this))
+            .receive("error", resp => { console.log("Unable to join", resp); });
+    }
+
+    got_view(view) {
+        console.log("new view", view);
+        this.setState(view.game);
     }
 
     getInitialTiles() {

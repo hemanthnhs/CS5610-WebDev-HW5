@@ -1,9 +1,11 @@
 defmodule MemoryWeb.TilesChannel do
   use MemoryWeb, :channel
+  alias Memory.Tile
 
   def join("tiles:" <> name, payload, socket) do
     if authorized?(payload) do
-      {:ok, %{"join" => name}, socket}
+      tile = Tile.new()
+      {:ok, %{"join" => name,"tile" => Tile.view(tile)}, socket}
     else
       {:error, %{reason: "unauthorized"}}
     end
