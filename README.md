@@ -26,6 +26,8 @@ information like score and the button to reset is only provided after the game b
 ## Attributions and References
     
 Course notes - http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/
+http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/notes/08-server-state/notes.html
+https://github.com/NatTuck/hangman-2019-01/tree/01-31-channel-hangman
 https://elixirschool.com/en/lessons/basics/strings/
 
 ## Server Setup

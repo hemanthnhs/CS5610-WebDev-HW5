@@ -1,5 +1,6 @@
 defmodule Memory.Tile do
   def new do
+  # Syntax reference: http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/notes/08-server-state/notes.html
     %{
       tiles: generate_tiles(),
       active_tiles: [],

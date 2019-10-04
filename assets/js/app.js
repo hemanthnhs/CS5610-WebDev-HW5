@@ -20,6 +20,8 @@ import game_init from "./starter-game";
 
 $(() => {
   let root = $('#root')[0];
+  //Socket Connection
+  //Attribution : https://github.com/NatTuck/hangman-2019-01/tree/01-31-channel-hangman
   let channel = socket.channel("tiles:" + window.tileName, {});
   game_init(root, channel);
 });

@@ -1,4 +1,5 @@
 <script>
+ //Attribution : https://github.com/NatTuck/hangman-2019-01/tree/01-31-channel-hangman
  window.tileName = "<%= @name %>";
 </script>
 <div class="row">

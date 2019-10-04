@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import _ from 'lodash';
 
 export default function game_init(root, channel) {
     ReactDOM.render(<Starter channel={channel}/>, root);
@@ -11,8 +10,6 @@ class Starter extends React.Component {
     constructor(props) {
         super(props);
         this.channel = props.channel;
-        //Generating tiles data and initializing tile properties
-        //{0:{letter:'D',status:'hide',count:0},1:{...},....}
         this.state = {tiles: [], active_tiles: [], completed_tiles: [], clicks: 0, gameStatus: 0};
         // Attribution http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/notes/05-react/
         this.handleClick = this.handleClick.bind(this);
@@ -26,7 +23,6 @@ class Starter extends React.Component {
     }
 
     got_view(view) {
-        console.log("new view", view);
         this.setState(view.tile);
         if(view.tile.active_tiles.length == 2){
             //Update state after the delay
