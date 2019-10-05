@@ -5,6 +5,17 @@ export default function game_init(root, channel) {
     ReactDOM.render(<Starter channel={channel}/>, root);
 }
 
+//Attribution : Nats Notes - CS5610
+/*
+* State structure
+* state = {
+*   tiles = [], // tile data
+*   active_tiles: [], // indexes of active tiles
+*   completed_tiles: [], // indexes of completed tiles
+*   clicks: 0, //clicks to complete the game
+*   gameStatus: 0 //game status as in yet to start (or) in progress (or) completed
+* }
+* */
 class Starter extends React.Component {
     //Constructor method for initializing the state
     constructor(props) {
@@ -24,8 +35,9 @@ class Starter extends React.Component {
 
     got_view(view) {
         this.setState(view.tile);
-        if(view.tile.active_tiles.length == 2){
+        if (view.tile.active_tiles.length == 2) {
             //Update state after the delay
+            //Having this delay in client side as we didnt have GenServer setup yet to avoid/ignore calls during delay.
             setTimeout(() => {
                 this.channel.push("clear_active", {})
                     .receive("ok", this.got_view.bind(this));
@@ -35,7 +47,8 @@ class Starter extends React.Component {
 
     //This method is to handle the click of tiles. Based on the state of game, the new state will be generated here.
     handleClick(id) {
-        if(this.state.active_tiles.length != 2){
+        //Having this check in client side as we didnt have GenServer setup yet to avoid/ignore calls during delay.
+        if (this.state.active_tiles.length != 2) {
             this.channel.push("select", {tile_id: id})
                 .receive("ok", this.got_view.bind(this));
         }
@@ -47,16 +60,17 @@ class Starter extends React.Component {
             .receive("ok", this.got_view.bind(this));
     }
 
-    //Utility to get game status
+    // The code below is purely UI and display purpose and doesn't effect the state of game.
+
+    //Utility to have game status text
     fetchGameStatus(STATUS) {
-        //Game 0 implies not started case
         if (this.state.gameStatus == 0) {
             return STATUS.BEGIN;
         } else if (this.state.gameStatus == 2) {
             //All tiles matched case
             return STATUS.COMPLETE;
         }
-        return STATUS.INPROGRESS;
+        return STATUS[this.state.gameStatus];
     }
 
     //Utility for score rendering area. Not to display before the game begin

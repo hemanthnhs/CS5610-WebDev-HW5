@@ -1,9 +1,7 @@
 defmodule Memory.BackupAgent do
   use Agent
 
-  # This is basically just a global mutable map.
-  # TODO: Add timestamps and expiration.
-
+  # Attribution: Nats Notes http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/
   def start_link(_args) do
     Agent.start_link(fn -> %{} end, name: __MODULE__)
   end

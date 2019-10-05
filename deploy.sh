@@ -20,7 +20,7 @@ echo "Generating release..."
 mix release
 
 echo "Stopping old copy of app, if any..."
-#_build/prod/rel/draw/bin/practice stop || true
+#_build/prod/rel/memory/bin/memory stop || true
 
 echo "Starting app..."
 _build/prod/rel/memory/bin/memory start

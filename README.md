@@ -13,15 +13,22 @@ Attribution: CS5610 Task details.
 
 ## Design Decisions
 
-The app state is stored as a single variable { 0 : { letter : 'D', status : 'hide', count : 0}, 1 : {...}, ....}.
-Where each key has a letter stored with its alphabet, status variable indicating the status of tile.
-Status includes 'hide', 'active' and 'completed'. This will be used to derive other information of the game
-like game complete. Another variable count is to keep the track of number of times this tile is clicked.
-Each tile count is summed to obtain the total score of the game. Onclick event is developed to properly update the state
-and necessary changes will be made.
+State from Homework4 has been modified to 
+ 
+ state = {
+   tiles = [], // tile data
+   active_tiles: [], // indexes of active tiles
+   completed_tiles: [], // indexes of completed tiles
+   clicks: 0, //clicks to complete the game
+   gameStatus: 0 //game status as in yet to start (or) in progress (or) completed
+ }
+ 
+ The state was modified considering the backend implementation and for clearing active unmatched tiles.
+ This will even remove the map function to compute total score prior as from HW4.
 
-The decisions related to usage convenience were made to have styles properly to understand various tiles and the game 
-information like score and the button to reset is only provided after the game begins.
+Decision of handling delay and ignoring the clicks during delay was made to implement in client/browser side.
+This decision was because we didnt have GenServer setup yet to ignore the calls and to not have additional parameters
+in state for last active indication a timeout event is designed in browser side itself.
 
 ## Attributions and References
     
@@ -29,6 +36,8 @@ Course notes - http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/
 http://ccs.neu.edu/home/ntuck/courses/2019/09/cs5610/notes/08-server-state/notes.html
 https://github.com/NatTuck/hangman-2019-01/tree/01-31-channel-hangman
 https://elixirschool.com/en/lessons/basics/strings/
+https://elixir-lang.org/docs.html
+Backup Agent, Channel setup, channel calls referenced to Nats Notes - CS5610
 
 ## Server Setup
 
