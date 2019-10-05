@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import _ from 'lodash';
 
 export default function game_init(root, channel) {
     ReactDOM.render(<Starter channel={channel}/>, root);
@@ -46,9 +47,9 @@ class Starter extends React.Component {
     }
 
     //This method is to handle the click of tiles. Based on the state of game, the new state will be generated here.
-    handleClick(id) {
+    handleClick(data, id) {
         //Having this check in client side as we didnt have GenServer setup yet to avoid/ignore calls during delay.
-        if (this.state.active_tiles.length != 2) {
+        if (data.active_tiles.length != 2) {
             this.channel.push("select", {tile_id: id})
                 .receive("ok", this.got_view.bind(this));
         }
@@ -63,30 +64,31 @@ class Starter extends React.Component {
     // The code below is purely UI and display purpose and doesn't effect the state of game.
 
     //Utility to have game status text
-    fetchGameStatus(STATUS) {
-        if (this.state.gameStatus == 0) {
+    fetchGameStatus(data, STATUS) {
+        if (data.gameStatus == 0) {
             return STATUS.BEGIN;
-        } else if (this.state.gameStatus == 2) {
+        } else if (data.gameStatus == 2) {
             //All tiles matched case
             return STATUS.COMPLETE;
         }
-        return STATUS[this.state.gameStatus];
+        return STATUS.INPROGRESS;
     }
 
     //Utility for score rendering area. Not to display before the game begin
-    renderScoreArea(gameStatus, STATUS) {
+    renderScoreArea(score_val, gameStatus, STATUS) {
+        console.log(score_val)
         if (gameStatus != STATUS.BEGIN) {
             //When game completes
             let scoreLabel = (gameStatus == STATUS.COMPLETE) ? "Final Score" : "Score"
             let score = <span
-                className="column column-100"><h1><u>{scoreLabel}</u></h1><h2>{this.state.clicks}</h2></span>;
+                className="column column-100"><h1><u>{scoreLabel}</u></h1><h2>{score_val}</h2></span>;
             return score
         }
         return <span></span>
     }
 
     // Render utility to generate tiles
-    generateGridRows() {
+    generateGridRows(data) {
         // Object to store the tiles
         let grid_rows = []
         let grid_ind = 1
@@ -100,16 +102,16 @@ class Starter extends React.Component {
                 // To assign class based on state
                 // Useful for styling
                 let classVar = "hide"
-                if (this.state.active_tiles.includes(id)) {
+                if (data.active_tiles.includes(id)) {
                     classVar = "tile-active"
-                } else if (this.state.completed_tiles.includes(id)) {
+                } else if (data.completed_tiles.includes(id)) {
                     classVar = "tile-complete"
                 }
                 col_grids.push(<td key={id} id={id} className={'column column-25 tile ' + classVar}
                                    onClick={() => {
-                                       this.handleClick(id)
-                                   }}>{(this.state.active_tiles.includes(id) || this.state.completed_tiles.includes(id))
-                    ? this.state.tiles[id - 1] : ''}</td>)
+                                       this.handleClick(data, id)
+                                   }}>{(data.active_tiles.includes(id) || data.completed_tiles.includes(id))
+                    ? data.tiles[id - 1] : ''}</td>)
             }
             grid_rows.push(<tr key={row} className="row">{col_grids}</tr>)
         }
@@ -127,7 +129,7 @@ class Starter extends React.Component {
         }
     }
 
-    renderGameInfo() {
+    renderGameInfo(data) {
         //enum variable for game status
         const STATUS = {
             BEGIN: "Yet to Start..",
@@ -135,10 +137,10 @@ class Starter extends React.Component {
             COMPLETE: "YOU WIN!!!!"
         }
         //Get game status
-        let gameStatus = this.fetchGameStatus(STATUS);
+        let gameStatus = this.fetchGameStatus(data, STATUS);
         let status = <span
             className="column column-100"><h1><u>Game Status</u></h1><h2>{gameStatus}</h2></span>;
-        let score = this.renderScoreArea(gameStatus, STATUS)
+        let score = this.renderScoreArea(data.clicks, gameStatus, STATUS)
         let button = this.renderInstructionSection(gameStatus, STATUS);
 
         let instructions = <span className="column column-100"
@@ -151,14 +153,15 @@ class Starter extends React.Component {
 
     //Render
     render() {
-        let grid_rows = this.generateGridRows()
+        let data = _.cloneDeep(this.state);
+        let grid_rows = this.generateGridRows(data)
         let tiles = <span className="column column-80 column-offset-20">
             <table>
                 <tbody>{grid_rows}</tbody>
             </table>
         </span>;
         let header = <div id="game-heard" className="column column=100">Memory Game</div>
-        let gameInfoDisplay = this.renderGameInfo()
+        let gameInfoDisplay = this.renderGameInfo(data)
         return <div>
             <div className="row">
                 {header}
