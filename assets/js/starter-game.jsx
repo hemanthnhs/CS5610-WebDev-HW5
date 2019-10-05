@@ -153,14 +153,16 @@ class Starter extends React.Component {
 
     //Render
     render() {
-        let data = _.cloneDeep(this.state);
+        //Reference for pure function from Nats Notes
+        let data = _.cloneDeep(this.state)
+        let gameTitle = (window.tileName) ? " - "+window.tileName : ""
         let grid_rows = this.generateGridRows(data)
         let tiles = <span className="column column-80 column-offset-20">
             <table>
                 <tbody>{grid_rows}</tbody>
             </table>
         </span>;
-        let header = <div id="game-heard" className="column column=100">Memory Game</div>
+        let header = <div id="game-heard" className="column column=100">Memory Game{gameTitle}</div>
         let gameInfoDisplay = this.renderGameInfo(data)
         return <div>
             <div className="row">
